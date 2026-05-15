@@ -1,0 +1,46 @@
+name: test
+
+on:
+  pull_request:
+  push:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+jobs:
+  smoke-pinned:
+    name: pinned version + dry-run autofix
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+      - id: scan
+        uses: ./
+        with:
+          version: "0.3.0"
+          autofix: dry-run
+          fail-on: critical
+          upload-sarif: false
+      - name: Show outputs
+        run: |
+          echo "version=${{ steps.scan.outputs.resolved-version }}"
+          echo "findings=${{ steps.scan.outputs.findings }}"
+          echo "failing=${{ steps.scan.outputs.failing-findings }}"
+
+  smoke-latest:
+    name: latest + permissive gate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./
+        with:
+          version: latest
+          fail-on: none
+          upload-sarif: false
+
