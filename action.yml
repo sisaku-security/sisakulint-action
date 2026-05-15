@@ -44,7 +44,7 @@ inputs:
       Upload SARIF results to GitHub Code Scanning (true/false).
       Requires `permissions: security-events: write` on the calling job.
     required: false
-    default: "true"
+    default: "false"
   sarif-file:
     description: Path where SARIF output is written.
     required: false

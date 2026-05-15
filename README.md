@@ -10,10 +10,6 @@ sisakulint covers the [OWASP Top 10 CI/CD Security Risks](https://owasp.org/www-
 
 ## Quick start
 
-A security tool that itself depends on a mutable tag is a contradiction. This Action is published **for SHA-pinning only** — the [Harden-Runner](https://github.com/step-security/harden-runner) / [OpenSSF Scorecard](https://github.com/ossf/scorecard) style. The tag in the trailing comment is human-readable; the SHA is what GitHub actually resolves. A compromised or moved tag cannot redirect your workflow.
-
-The example below is **lint-clean against sisakulint `v0.3.0`** (`findings=0`):
-
 ```yaml
 # .github/workflows/sisakulint.yml
 name: sisakulint
@@ -63,9 +59,7 @@ updates:
 Findings appear under the **Security → Code scanning** tab, and high/critical issues are surfaced as inline PR annotations.
 
 > [!TIP]
-> [Dependabot](https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file#package-ecosystem) updates the SHA *and* the trailing version comment together. Never edit the SHA by hand.
-
-The latest release SHA is shown on the [Releases page](https://github.com/sisaku-security/sisakulint-action/releases) — copy it from there, never from a tag.
+> [Dependabot](https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file#package-ecosystem) updates the SHA *and* the trailing version comment together.
 
 ## Inputs
 
@@ -77,7 +71,7 @@ The latest release SHA is shown on the [Releases page](https://github.com/sisaku
 | `config-file` | `""` | Path to a sisakulint config file. Passed as `-config-file`. |
 | `autofix` | `off` | `off` \| `on` \| `dry-run`. `on` rewrites files in place; pair with a commit step. |
 | `fail-on` | `high` | `none` \| `low` \| `medium` \| `high` \| `critical`. Minimum severity that fails the job. |
-| `upload-sarif` | `true` | Upload the SARIF result to GitHub Code Scanning. Requires `security-events: write`. |
+| `upload-sarif` | `false` | Upload the SARIF result to GitHub Code Scanning. Requires `security-events: write`. |
 | `sarif-file` | `sisakulint.sarif` | Path the SARIF report is written to. |
 | `github-token` | `${{ github.token }}` | Token used only when `version: latest` to resolve the release tag. |
 
@@ -91,8 +85,6 @@ The latest release SHA is shown on the [Releases page](https://github.com/sisaku
 | `resolved-version` | The concrete sisakulint version that was installed. |
 
 ## Recipes
-
-Every recipe below is shown as the **step block only** for brevity. Drop it into a job with `runs-on` and the `permissions` shown in [Quick start](#quick-start). All third-party actions are pinned to full commit SHAs; every snippet has been linted with `sisakulint v0.3.0` and produces zero findings.
 
 ### Block PRs on `critical` only
 
@@ -141,22 +133,12 @@ Every recipe below is shown as the **step block only** for brevity. Drop it into
 
 ## Permissions
 
-This Action needs:
+This Action needs
 
 - `contents: read` — to read your workflow files.
 - `security-events: write` — only when `upload-sarif: true`, to push SARIF into Code Scanning.
 
-If your repo is in an org without GitHub Advanced Security, Code Scanning isn't available; set `upload-sarif: false` and rely on the inline PR annotations.
-
-## How it works
-
-1. Resolves `version` (via `https://api.github.com/repos/sisaku-security/sisakulint/releases/latest` when `latest`).
-2. Downloads the matching `linux_amd64` / `linux_arm64` / `darwin_amd64` / `darwin_arm64` archive.
-3. **Verifies the SHA-256 checksum** against the official `sisakulint_<ver>_checksums.txt` before extraction.
-4. Runs `sisakulint -fix <autofix> -format '{{sarif .}}'` and writes SARIF.
-5. Emits `::error` / `::warning` annotations per finding (Critical/High → error, others → warning).
-6. Applies the `fail-on` policy by classifying each result via rule-id suffix (`-critical`, `-high`, `-medium`, `-low`) and message markers.
-7. Uploads SARIF via [`github/codeql-action/upload-sarif@v3`](https://github.com/github/codeql-action) when `upload-sarif: true`.
+If your repo is in an org without GitHub Advanced Security, Code Scanning isn't available; use `upload-sarif: false` (default) and rely on the inline PR annotations.
 
 ## Compatibility
 
