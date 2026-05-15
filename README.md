@@ -7,7 +7,7 @@ This action sets up sisakulint CLI tool in your GitHub Actions workflow.
 ```yaml
 - uses: sisaku-security/setup-sisakulint@v1
   with:
-    sisakulint_version: '0.0.9'
+    sisakulint_version: '0.3.0'
 ```
 
 ## Inputs
@@ -27,6 +27,6 @@ jobs:
       - uses: actions/checkout@v4
       - uses: sisaku-security/setup-sisakulint@v1
         with:
-          sisakulint_version: '0.0.9'
+          sisakulint_version: '0.3.0'
       - run: sisakulint scan
 ```
