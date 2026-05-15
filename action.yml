@@ -50,7 +50,7 @@ inputs:
     required: false
     default: "sisakulint.sarif"
   github-token:
-    description: Token used to query the GitHub API for `version: latest`. Defaults to GITHUB_TOKEN.
+    description: "Token used to query the GitHub API for `version: latest`. Defaults to GITHUB_TOKEN."
     required: false
     default: ${{ github.token }}
 
