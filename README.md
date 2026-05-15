@@ -29,19 +29,13 @@ permissions:
 jobs:
   scan:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      security-events: write      # required for upload-sarif: true
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683            # v4.2.2
         with:
           persist-credentials: false
       - uses: sisaku-security/sisakulint-action@f92185efeaff7ac9a6ed72b6e5d68412ea13ab54  # v1.0.0
         with:
-          version: "0.3.0"        # also pin the binary
-          upload-sarif: true
-          fail-on: critical
-          autofix: dry-run
+          version: "0.3.0"   # also pin the binary
 ```
 
 And the matching `.github/dependabot.yaml` so SHA bumps come in as reviewable PRs:
@@ -56,7 +50,7 @@ updates:
       interval: weekly
 ```
 
-Findings appear under the **Security → Code scanning** tab, and high/critical issues are surfaced as inline PR annotations.
+Findings appear as inline PR annotations. To also push them to **Security → Code scanning**, add `upload-sarif: true` and grant `security-events: write` to the job.
 
 > [!TIP]
 > [Dependabot](https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file#package-ecosystem) updates the SHA *and* the trailing version comment together.
