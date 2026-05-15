@@ -35,7 +35,7 @@ jobs:
           persist-credentials: false
       - uses: sisaku-security/sisakulint-action@f92185efeaff7ac9a6ed72b6e5d68412ea13ab54  # v1.0.0
         with:
-          version: "0.3.0"   # also pin the binary
+          version: "0.3.0"
 ```
 
 And the matching `.github/dependabot.yaml` so SHA bumps come in as reviewable PRs:
