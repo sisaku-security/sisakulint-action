@@ -29,8 +29,6 @@ permissions:
 jobs:
   scan:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683            # v4.2.2
         with:
