@@ -34,8 +34,6 @@ jobs:
         with:
           persist-credentials: false
       - uses: sisaku-security/sisakulint-action@f92185efeaff7ac9a6ed72b6e5d68412ea13ab54  # v1.0.0
-        with:
-          version: "0.3.0"
 ```
 
 And the matching `.github/dependabot.yaml` so SHA bumps come in as reviewable PRs:
@@ -59,7 +57,7 @@ Findings appear as inline PR annotations. To also push them to **Security → Co
 
 | Name | Default | Description |
 |---|---|---|
-| `version` | `latest` | sisakulint version to install. Pass a tag like `0.3.0` / `v0.3.0`, or `latest` to resolve from the GitHub API. |
+| `version` | `0.3.0` | sisakulint release tag to install. Pinned to the version this Action release was tested against. Override to roll forward (e.g. `0.4.0`). |
 | `working-directory` | repo root | Directory to `cd` into before running sisakulint. |
 | `args` | `""` | Extra raw args appended to the sisakulint invocation (e.g. `-ignore "missing-timeout-minutes"`). |
 | `config-file` | `""` | Path to a sisakulint config file. Passed as `-config-file`. |
@@ -67,7 +65,6 @@ Findings appear as inline PR annotations. To also push them to **Security → Co
 | `fail-on` | `high` | `none` \| `low` \| `medium` \| `high` \| `critical`. Minimum severity that fails the job. |
 | `upload-sarif` | `false` | Upload the SARIF result to GitHub Code Scanning. Requires `security-events: write`. |
 | `sarif-file` | `sisakulint.sarif` | Path the SARIF report is written to. |
-| `github-token` | `${{ github.token }}` | Token used only when `version: latest` to resolve the release tag. |
 
 ## Outputs
 
@@ -88,7 +85,6 @@ Findings appear as inline PR annotations. To also push them to **Security → Co
           persist-credentials: false
       - uses: sisaku-security/sisakulint-action@f92185efeaff7ac9a6ed72b6e5d68412ea13ab54  # v1.0.0
         with:
-          version: "0.3.0"
           fail-on: critical
           upload-sarif: true
 ```
@@ -101,10 +97,8 @@ Findings appear as inline PR annotations. To also push them to **Security → Co
           persist-credentials: false
       - uses: sisaku-security/sisakulint-action@f92185efeaff7ac9a6ed72b6e5d68412ea13ab54  # v1.0.0
         with:
-          version: "0.3.0"
           autofix: "on"
-          fail-on: none                # let autofix run, then commit the diff
-          upload-sarif: false
+          fail-on: none
       - uses: peter-evans/create-pull-request@d4f3be6ce6f4083b7ac7490ab98b48a62db1ee41  # v7.0.10
         with:
           branch: sisakulint/autofix
@@ -120,7 +114,6 @@ Findings appear as inline PR annotations. To also push them to **Security → Co
           persist-credentials: false
       - uses: sisaku-security/sisakulint-action@f92185efeaff7ac9a6ed72b6e5d68412ea13ab54  # v1.0.0
         with:
-          version: "0.3.0"
           config-file: .github/sisakulint.yaml
           args: -ignore "some-rule-id"
 ```
