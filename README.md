@@ -33,7 +33,7 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683            # v4.2.2
         with:
           persist-credentials: false
-      - uses: sisaku-security/sisakulint-action@f92185efeaff7ac9a6ed72b6e5d68412ea13ab54  # v1.0.0
+      - uses: sisaku-security/sisakulint-action@596af4ab15e8c5b232c74aa97525a0302e7b7af4  # v1.0.0
 ```
 
 And the matching `.github/dependabot.yaml` so SHA bumps come in as reviewable PRs:
@@ -83,7 +83,7 @@ Findings appear as inline PR annotations. To also push them to **Security → Co
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683            # v4.2.2
         with:
           persist-credentials: false
-      - uses: sisaku-security/sisakulint-action@f92185efeaff7ac9a6ed72b6e5d68412ea13ab54  # v1.0.0
+      - uses: sisaku-security/sisakulint-action@596af4ab15e8c5b232c74aa97525a0302e7b7af4  # v1.0.0
         with:
           fail-on: critical
           upload-sarif: true
@@ -95,7 +95,7 @@ Findings appear as inline PR annotations. To also push them to **Security → Co
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683            # v4.2.2
         with:
           persist-credentials: false
-      - uses: sisaku-security/sisakulint-action@f92185efeaff7ac9a6ed72b6e5d68412ea13ab54  # v1.0.0
+      - uses: sisaku-security/sisakulint-action@596af4ab15e8c5b232c74aa97525a0302e7b7af4  # v1.0.0
         with:
           autofix: "on"
           fail-on: none
@@ -112,7 +112,7 @@ Findings appear as inline PR annotations. To also push them to **Security → Co
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683            # v4.2.2
         with:
           persist-credentials: false
-      - uses: sisaku-security/sisakulint-action@f92185efeaff7ac9a6ed72b6e5d68412ea13ab54  # v1.0.0
+      - uses: sisaku-security/sisakulint-action@596af4ab15e8c5b232c74aa97525a0302e7b7af4  # v1.0.0
         with:
           config-file: .github/sisakulint.yaml
           args: -ignore "some-rule-id"
