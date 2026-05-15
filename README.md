@@ -70,8 +70,7 @@ You opt into a specific Action *and* sisakulint binary version. Reproducible, bu
 This is the [Harden-Runner](https://github.com/step-security/harden-runner) / [scorecard](https://github.com/ossf/scorecard) style. The tag is a comment; the SHA is what GitHub actually resolves. A compromised tag cannot redirect your workflow.
 
 ```yaml
-# v1.0.0 — replace with the SHA you copied from the Releases page
-- uses: sisaku-security/sisakulint-action@REPLACE_WITH_V1_0_0_SHA  # v1.0.0
+- uses: sisaku-security/sisakulint-action@60c04f6a024125eb39ea6da9513407ef0e276125  # v1.0.0
   with:
     version: "0.3.0"   # also pin the binary
 ```
