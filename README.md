@@ -10,7 +10,12 @@ sisakulint covers the [OWASP Top 10 CI/CD Security Risks](https://owasp.org/www-
 
 ## Quick start
 
+A security tool that itself depends on a mutable tag is a contradiction. This Action is published **for SHA-pinning only** — the [Harden-Runner](https://github.com/step-security/harden-runner) / [OpenSSF Scorecard](https://github.com/ossf/scorecard) style. The tag in the trailing comment is human-readable; the SHA is what GitHub actually resolves. A compromised or moved tag cannot redirect your workflow.
+
+The example below is **lint-clean against sisakulint `v0.3.0`** (`findings=0`):
+
 ```yaml
+# .github/workflows/sisakulint.yml
 name: sisakulint
 
 on:
@@ -24,59 +29,43 @@ on:
 
 permissions:
   contents: read
-  security-events: write     # required for upload-sarif: true
 
 jobs:
   scan:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write      # required for upload-sarif: true
     steps:
-      - uses: actions/checkout@v4
-      - uses: sisaku-security/sisakulint-action@v1
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683            # v4.2.2
         with:
-          version: latest
+          persist-credentials: false
+      - uses: sisaku-security/sisakulint-action@b2d27d0b3b9c054835fd10973ac7f1f581b643bb  # v1.0.0
+        with:
+          version: "0.3.0"        # also pin the binary
           upload-sarif: true
           fail-on: critical
           autofix: dry-run
 ```
 
-That's it. Findings appear under the **Security → Code scanning** tab, and high/critical issues are surfaced as inline PR annotations.
-
-## Three pinning patterns
-
-Pick the level of supply-chain hardening you want.
-
-### 1. Floating major tag (recommended for most teams)
-
-You always get the latest backwards-compatible release. Easiest to upgrade.
+And the matching `.github/dependabot.yaml` so SHA bumps come in as reviewable PRs:
 
 ```yaml
-- uses: sisaku-security/sisakulint-action@v1
-  with:
-    version: latest
+# .github/dependabot.yaml
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
 ```
 
-### 2. Pinned release tag
-
-You opt into a specific Action *and* sisakulint binary version. Reproducible, but no automatic security fixes for the Action itself.
-
-```yaml
-- uses: sisaku-security/sisakulint-action@v1.0.0
-  with:
-    version: "0.3.0"
-```
-
-### 3. Full commit SHA (recommended for security-conscious repos)
-
-This is the [Harden-Runner](https://github.com/step-security/harden-runner) / [scorecard](https://github.com/ossf/scorecard) style. The tag is a comment; the SHA is what GitHub actually resolves. A compromised tag cannot redirect your workflow.
-
-```yaml
-- uses: sisaku-security/sisakulint-action@60c04f6a024125eb39ea6da9513407ef0e276125  # v1.0.0
-  with:
-    version: "0.3.0"   # also pin the binary
-```
+Findings appear under the **Security → Code scanning** tab, and high/critical issues are surfaced as inline PR annotations.
 
 > [!TIP]
-> Combine pattern 3 with [Dependabot](https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file#package-ecosystem) (`package-ecosystem: github-actions`) to get automated, reviewable bump PRs that update the SHA together with the trailing version comment.
+> [Dependabot](https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file#package-ecosystem) updates the SHA *and* the trailing version comment together. Never edit the SHA by hand.
+
+The latest release SHA is shown on the [Releases page](https://github.com/sisaku-security/sisakulint-action/releases) — copy it from there, never from a tag.
 
 ## Inputs
 
@@ -103,38 +92,51 @@ This is the [Harden-Runner](https://github.com/step-security/harden-runner) / [s
 
 ## Recipes
 
-### Block PRs on `critical` only, warn on the rest
+Every recipe below is shown as the **step block only** for brevity. Drop it into a job with `runs-on` and the `permissions` shown in [Quick start](#quick-start). All third-party actions are pinned to full commit SHAs; every snippet has been linted with `sisakulint v0.3.0` and produces zero findings.
+
+### Block PRs on `critical` only
 
 ```yaml
-- uses: sisaku-security/sisakulint-action@v1
-  with:
-    fail-on: critical
-    upload-sarif: true
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683            # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: sisaku-security/sisakulint-action@b2d27d0b3b9c054835fd10973ac7f1f581b643bb  # v1.0.0
+        with:
+          version: "0.3.0"
+          fail-on: critical
+          upload-sarif: true
 ```
 
 ### Open an autofix PR
 
 ```yaml
-- uses: actions/checkout@v4
-- uses: sisaku-security/sisakulint-action@v1
-  with:
-    autofix: on
-    fail-on: none           # let the autofix do its job, then commit
-    upload-sarif: false
-- uses: peter-evans/create-pull-request@v6
-  with:
-    branch: sisakulint/autofix
-    commit-message: "fix(ci): sisakulint autofix"
-    title: "sisakulint autofix"
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683            # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: sisaku-security/sisakulint-action@b2d27d0b3b9c054835fd10973ac7f1f581b643bb  # v1.0.0
+        with:
+          version: "0.3.0"
+          autofix: "on"
+          fail-on: none                # let autofix run, then commit the diff
+          upload-sarif: false
+      - uses: peter-evans/create-pull-request@d4f3be6ce6f4083b7ac7490ab98b48a62db1ee41  # v7.0.10
+        with:
+          branch: sisakulint/autofix
+          commit-message: "fix(ci): sisakulint autofix"
+          title: "sisakulint autofix"
 ```
 
 ### Local config & ignore rules
 
 ```yaml
-- uses: sisaku-security/sisakulint-action@v1
-  with:
-    config-file: .github/sisakulint.yaml
-    args: -ignore "missing-timeout-minutes"
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683            # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: sisaku-security/sisakulint-action@b2d27d0b3b9c054835fd10973ac7f1f581b643bb  # v1.0.0
+        with:
+          version: "0.3.0"
+          config-file: .github/sisakulint.yaml
+          args: -ignore "some-rule-id"
 ```
 
 ## Permissions
