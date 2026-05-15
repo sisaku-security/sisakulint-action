@@ -36,7 +36,7 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683            # v4.2.2
         with:
           persist-credentials: false
-      - uses: sisaku-security/sisakulint-action@b2d27d0b3b9c054835fd10973ac7f1f581b643bb  # v1.0.0
+      - uses: sisaku-security/sisakulint-action@f92185efeaff7ac9a6ed72b6e5d68412ea13ab54  # v1.0.0
         with:
           version: "0.3.0"        # also pin the binary
           upload-sarif: true
@@ -92,7 +92,7 @@ Findings appear under the **Security → Code scanning** tab, and high/critical 
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683            # v4.2.2
         with:
           persist-credentials: false
-      - uses: sisaku-security/sisakulint-action@b2d27d0b3b9c054835fd10973ac7f1f581b643bb  # v1.0.0
+      - uses: sisaku-security/sisakulint-action@f92185efeaff7ac9a6ed72b6e5d68412ea13ab54  # v1.0.0
         with:
           version: "0.3.0"
           fail-on: critical
@@ -105,7 +105,7 @@ Findings appear under the **Security → Code scanning** tab, and high/critical 
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683            # v4.2.2
         with:
           persist-credentials: false
-      - uses: sisaku-security/sisakulint-action@b2d27d0b3b9c054835fd10973ac7f1f581b643bb  # v1.0.0
+      - uses: sisaku-security/sisakulint-action@f92185efeaff7ac9a6ed72b6e5d68412ea13ab54  # v1.0.0
         with:
           version: "0.3.0"
           autofix: "on"
@@ -124,7 +124,7 @@ Findings appear under the **Security → Code scanning** tab, and high/critical 
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683            # v4.2.2
         with:
           persist-credentials: false
-      - uses: sisaku-security/sisakulint-action@b2d27d0b3b9c054835fd10973ac7f1f581b643bb  # v1.0.0
+      - uses: sisaku-security/sisakulint-action@f92185efeaff7ac9a6ed72b6e5d68412ea13ab54  # v1.0.0
         with:
           version: "0.3.0"
           config-file: .github/sisakulint.yaml
@@ -139,12 +139,6 @@ This Action needs
 - `security-events: write` — only when `upload-sarif: true`, to push SARIF into Code Scanning.
 
 If your repo is in an org without GitHub Advanced Security, Code Scanning isn't available; use `upload-sarif: false` (default) and rely on the inline PR annotations.
-
-## Compatibility
-
-- Runners: `ubuntu-*`, `macos-*` (x64 + arm64). Windows is not supported.
-- sisakulint: `v0.3.0` or later (earlier versions do not publish arm64 / checksums).
-- GitHub Enterprise Server: works wherever `github/codeql-action/upload-sarif@v3` is available.
 
 ## License
 
