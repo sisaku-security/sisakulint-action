@@ -42,3 +42,13 @@ jobs:
       - uses: ./
         with:
           fail-on: none
+
+  smoke-reusable:
+    name: reusable workflow self-call
+    uses: ./.github/workflows/scan.yml
+    permissions:
+      contents: read
+      security-events: write
+    with:
+      fail-on: none
+      upload-sarif: false

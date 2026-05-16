@@ -1,0 +1,114 @@
+name: sisakulint scan (reusable)
+
+# Reusable workflow wrapper around sisakulint-action.
+#
+# Use this when you want to centralize sisakulint policy across many repos —
+# either via an org-wide `.github` repository, or by pinning it as a
+# required workflow at the organization / repository ruleset level.
+#
+# Caller example:
+#
+#   jobs:
+#     sisakulint:
+#       uses: sisaku-security/sisakulint-action/.github/workflows/scan.yml@<SHA>
+#       with:
+#         fail-on: critical
+#         upload-sarif: true
+#       permissions:
+#         contents: read
+#         security-events: write
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: sisakulint release tag to install (e.g. "0.3.0").
+        required: false
+        type: string
+        default: "0.3.0"
+      working-directory:
+        description: Directory to run sisakulint from.
+        required: false
+        type: string
+        default: ""
+      args:
+        description: Extra raw args appended to the sisakulint invocation.
+        required: false
+        type: string
+        default: ""
+      config-file:
+        description: Path to a sisakulint config file (passed as `-config-file`).
+        required: false
+        type: string
+        default: ""
+      autofix:
+        description: Auto-fix mode. One of `off`, `on`, `dry-run`.
+        required: false
+        type: string
+        default: "off"
+      fail-on:
+        description: Minimum severity that fails the job. One of `none`, `low`, `medium`, `high`, `critical`.
+        required: false
+        type: string
+        default: "high"
+      upload-sarif:
+        description: Upload the SARIF result to GitHub Code Scanning.
+        required: false
+        type: boolean
+        default: false
+      sarif-file:
+        description: Path the SARIF report is written to.
+        required: false
+        type: string
+        default: "sisakulint.sarif"
+      runs-on:
+        description: Runner label. Override to use self-hosted or larger runners.
+        required: false
+        type: string
+        default: "ubuntu-latest"
+    outputs:
+      sarif-file:
+        description: Path to the generated SARIF file.
+        value: ${{ jobs.scan.outputs.sarif-file }}
+      findings:
+        description: Total SARIF results produced.
+        value: ${{ jobs.scan.outputs.findings }}
+      failing-findings:
+        description: Count of findings at or above the `fail-on` threshold.
+        value: ${{ jobs.scan.outputs.failing-findings }}
+      resolved-version:
+        description: The concrete sisakulint version that was installed.
+        value: ${{ jobs.scan.outputs.resolved-version }}
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    name: sisakulint
+    runs-on: ${{ inputs.runs-on }}
+    # security-events: write is required only when upload-sarif is true.
+    # Callers must grant it explicitly; this declares the maximum needed.
+    permissions:
+      contents: read
+      security-events: write
+    outputs:
+      sarif-file: ${{ steps.scan.outputs.sarif-file }}
+      findings: ${{ steps.scan.outputs.findings }}
+      failing-findings: ${{ steps.scan.outputs.failing-findings }}
+      resolved-version: ${{ steps.scan.outputs.resolved-version }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+        with:
+          persist-credentials: false
+      - id: scan
+        uses: sisaku-security/sisakulint-action@596af4ab15e8c5b232c74aa97525a0302e7b7af4  # v1.0.0
+        with:
+          version: ${{ inputs.version }}
+          working-directory: ${{ inputs.working-directory }}
+          args: ${{ inputs.args }}
+          config-file: ${{ inputs.config-file }}
+          autofix: ${{ inputs.autofix }}
+          fail-on: ${{ inputs.fail-on }}
+          upload-sarif: ${{ inputs.upload-sarif }}
+          sarif-file: ${{ inputs.sarif-file }}
