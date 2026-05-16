@@ -1,23 +1,5 @@
 name: sisakulint scan (reusable)
 
-# Reusable workflow wrapper around sisakulint-action.
-#
-# Use this when you want to centralize sisakulint policy across many repos —
-# either via an org-wide `.github` repository, or by pinning it as a
-# required workflow at the organization / repository ruleset level.
-#
-# Caller example:
-#
-#   jobs:
-#     sisakulint:
-#       uses: sisaku-security/sisakulint-action/.github/workflows/scan.yml@<SHA>
-#       with:
-#         fail-on: critical
-#         upload-sarif: true
-#       permissions:
-#         contents: read
-#         security-events: write
-
 on:
   workflow_call:
     inputs:
@@ -87,8 +69,6 @@ jobs:
   scan:
     name: sisakulint
     runs-on: ${{ inputs.runs-on }}
-    # security-events: write is required only when upload-sarif is true.
-    # Callers must grant it explicitly; this declares the maximum needed.
     permissions:
       contents: read
       security-events: write
