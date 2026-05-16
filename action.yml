@@ -161,8 +161,15 @@ runs:
           cfg_args+=(-config-file "$SISAKULINT_CONFIG")
         fi
 
-        # shellcheck disable=SC2206
-        extra_args=( $SISAKULINT_ARGS )
+        # POSIX shell-quote aware split so users can pass args like:
+        #   -ignore "rule-id"
+        # without the quotes being preserved as literal characters.
+        extra_args=()
+        while IFS= read -r tok; do
+          extra_args+=("$tok")
+        done < <(
+          python3 -c 'import shlex,sys; print("\n".join(shlex.split(sys.argv[1])))' "$SISAKULINT_ARGS"
+        )
 
         echo "::group::sisakulint scan (SARIF)"
         set +e
