@@ -168,7 +168,9 @@ runs:
         while IFS= read -r tok; do
           extra_args+=("$tok")
         done < <(
-          python3 -c 'import shlex,sys; print("\n".join(shlex.split(sys.argv[1])))' "$SISAKULINT_ARGS"
+          python3 -c 'import shlex,sys
+toks=shlex.split(sys.argv[1])
+sys.stdout.write("".join(t+"\n" for t in toks))' "$SISAKULINT_ARGS"
         )
 
         echo "::group::sisakulint scan (SARIF)"
