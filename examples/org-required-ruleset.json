@@ -1,0 +1,30 @@
+{
+  "name": "sisakulint-required",
+  "target": "branch",
+  "enforcement": "active",
+  "conditions": {
+    "ref_name": {
+      "include": ["~DEFAULT_BRANCH"],
+      "exclude": []
+    },
+    "repository_name": {
+      "include": ["~ALL"],
+      "exclude": [],
+      "protected": true
+    }
+  },
+  "rules": [
+    {
+      "type": "workflows",
+      "parameters": {
+        "workflows": [
+          {
+            "repository_id": 0,
+            "path": ".github/workflows/scan.yml",
+            "ref": "refs/tags/v1.0.0"
+          }
+        ]
+      }
+    }
+  ]
+}

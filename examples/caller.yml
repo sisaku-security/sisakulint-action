@@ -1,0 +1,26 @@
+# Place this file at .github/workflows/sisakulint.yml in any repo
+# to call the centrally-managed reusable workflow.
+name: sisakulint
+
+on:
+  pull_request:
+    paths: [".github/workflows/**"]
+  push:
+    branches: ["main"]
+    paths: [".github/workflows/**"]
+  schedule:
+    - cron: "0 3 * * 1"
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  scan:
+    # Pin to the exact commit of sisakulint-action you want to roll out
+    # org-wide. Dependabot (`package-ecosystem: github-actions`) will bump
+    # this SHA and the trailing version comment together.
+    uses: sisaku-security/sisakulint-action/.github/workflows/scan.yml@596af4ab15e8c5b232c74aa97525a0302e7b7af4  # v1.0.0
+    with:
+      fail-on: critical
+      upload-sarif: true

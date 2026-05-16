@@ -118,6 +118,66 @@ Findings appear as inline PR annotations. To also push them to **Security → Co
           args: -ignore "some-rule-id"
 ```
 
+## Org-wide rollout (reusable workflow)
+
+For centralized policy across many repositories, this repo also ships a
+[reusable workflow](https://docs.github.com/en/actions/concepts/workflows-and-actions/reusing-workflow-configurations)
+at [`.github/workflows/scan.yml`](./.github/workflows/scan.yml). It wraps the
+composite action with the same inputs and outputs, and is meant to be called
+from other repos so you only have to upgrade one SHA per release.
+
+### 1. Call it from any repo
+
+```yaml
+# .github/workflows/sisakulint.yml
+name: sisakulint
+on:
+  pull_request:
+    paths: [".github/workflows/**"]
+  push:
+    branches: ["main"]
+    paths: [".github/workflows/**"]
+permissions:
+  contents: read
+  security-events: write
+jobs:
+  scan:
+    uses: sisaku-security/sisakulint-action/.github/workflows/scan.yml@596af4ab15e8c5b232c74aa97525a0302e7b7af4  # v1.0.0
+    with:
+      fail-on: critical
+      upload-sarif: true
+```
+
+A copy-paste ready version lives at [`examples/caller.yml`](./examples/caller.yml).
+
+### 2. Enforce it org-wide via a ruleset
+
+To make sisakulint a [required workflow](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets#require-workflows-to-pass-before-merging)
+on every PR across an organization, create a branch ruleset with a `workflows`
+rule pointing at this repo:
+
+```bash
+ORG=your-org
+REPO_ID=$(gh api /repos/sisaku-security/sisakulint-action --jq .id)
+
+jq --argjson rid "$REPO_ID" \
+  '.rules[0].parameters.workflows[0].repository_id = $rid' \
+  examples/org-required-ruleset.json \
+  | gh api -X POST "/orgs/$ORG/rulesets" --input -
+```
+
+The ruleset template is at [`examples/org-required-ruleset.json`](./examples/org-required-ruleset.json).
+By default it targets `~DEFAULT_BRANCH` on `~ALL` repos with branch protection
+eligibility — adjust `conditions.repository_name` (or use `repository_property`
+conditions) to scope it to a subset.
+
+### 3. Or distribute via the org `.github` repo as a template
+
+Drop [`examples/caller.yml`](./examples/caller.yml) into
+`<org>/.github/workflow-templates/` together with a `sisakulint.properties.json`
+to surface it in every repo's "New workflow" picker. Useful when you want
+opt-in adoption rather than mandatory enforcement.
+
 ## Permissions
 
 This Action needs
